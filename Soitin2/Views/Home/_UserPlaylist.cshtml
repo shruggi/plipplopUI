@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Soitin2.SupplementalPlaylistView>
+
+<table id="userPlaylist" class="table table-condensed">
+    <thead>
+        <tr>
+            <th style="column-span: all;">User Queue Pool:</th>
+        </tr>
+        <tr>
+            <th>Artist</th>
+            <th>Title</th>
+            <th>Owner</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.artist</td>
+                <td>@item.title</td>
+                <td>@item.Owner</td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>

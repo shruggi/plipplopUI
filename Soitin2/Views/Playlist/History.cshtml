@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewBag.Title = "History";
+}
+@Scripts.Render("/Scripts/DataTables-1.10.0/media/js/jquery.dataTables.min.js")
+@Styles.Render("/Content/DataTables-1.10.0/media/css/jquery.dataTables.css")
+
+
+<h2>History!</h2>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("table#taulu").DataTable(
+            {
+                "bServerSide": true,
+                "sAjaxSource": "/Playlist/GetQueuedTable",
+                "bProcessing": true,
+                "pageLength": 25,
+                "aoColumns":
+                [
+                    {
+                        "sName": "Id",
+                        "bSortable": false
+                    },
+                    {
+                        "sName": "Addtime",
+                        "bSortable": false
+                    },
+                    {
+                        "sName": "Artist",
+                        "bSortable": false
+                    },
+                    {
+                        "sName": "Title",
+                        "bSortable": false
+                    },
+                    {
+                        "sName": "Source",
+                        "bSortable": false
+                    },
+                    {
+                        "sName": "Control",
+                        "bSortable": false
+                    }
+                ],
+
+            });
+    });
+
+</script>
+
+<table id="taulu">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Addtime</th>
+            <th>Artist</th>
+            <th>Title</th>
+            <th>Source</th>
+            <th>Control</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>

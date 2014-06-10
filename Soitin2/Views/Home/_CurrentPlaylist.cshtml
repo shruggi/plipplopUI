@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Soitin2.CurrentPlaylistSet>
+
+<table id="currentPlaylist" class="table table-condensed">
+    <thead>
+        <tr>
+            <th style="column-span: all;">Current Playlist:</th>
+        </tr>
+        <tr>
+            <th>#</th>
+            <th>Artist</th>
+            <th>Title</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.pos</td>
+                <td>@item.artist</td>
+                <td>@item.title</td>
+            </tr>
+        }
+    </tbody>
+</table>

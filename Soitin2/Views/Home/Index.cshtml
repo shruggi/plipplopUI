@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@if(User.Identity.IsAuthenticated)
+{
+    <!--Script references. -->
+    <script src="/signalr/hubs"></script>
+    <!--Add script to update the page and send messages.-->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            getUserPlaylist();
+            getCurrentPlaylist();
+        });
+
+        $(function () {
+            var msgdingdong = $.connection.msgHub;
+
+            msgdingdong.client.broadcastMessage = function (message) {
+                // Html encode display name and message. 
+                var encodedMsg = $('<div />').text(message).html();
+                // Add the message to the page. 
+                $('#messages').append('<li>' +  encodedMsg + '</li>');
+            };
+            msgdingdong.client.statusMessage = function (message, elapsedtime, totaltime, state) {
+                var percentage = Math.floor((elapsedtime / totaltime) * 100);
+                if (state == 0) { $('#stateicon').html("<span class=\"glyphicon glyphicon-stop\"></span>"); }
+                else if (state == 1) { $('#stateicon').html("<span class=\"glyphicon glyphicon-play\"></span>"); }
+                else if (state == 2) { $('#stateicon').html("<span class=\"glyphicon glyphicon-pause\"></span>"); }
+
+                $('#trackname').text(message);
+                $('#trackprogress').attr('aria-valuenow', percentage);
+                $('#trackprogress').attr('style', 'width: ' + percentage + '%;');
+            };
+            msgdingdong.client.currentPlaylistUpdateMessage = function () {
+                getCurrentPlaylist();
+            }
+            msgdingdong.client.supplementalPlaylistUpdateMessage = function () {
+                getUserPlaylist();
+            }
+            $.connection.hub.start().done(function () {
+                $('#sendMessage').click(function () {
+                    // Call the Send method on the hub. 
+                    msgdingdong.server.send("plop!");
+                    // Clear text box and reset focus for next comment. 
+                });
+            });
+        });
+
+        function getCurrentPlaylist() {
+            $.ajax({
+                // Get Faculty PartialView
+                url: "/Home/_CurrentPlaylist",
+                type: 'Get',
+                success: function (data) {
+                    $("div#currentPlaylist").empty().append(data);
+                },
+                error: function () {
+                    alert("something seems wrong");
+                }
+            });
+        }
+        function getUserPlaylist() {
+            $.ajax({
+                // Get Faculty PartialView
+                url: "/Home/_UserPlaylist",
+                type: 'Get',
+                success: function (data) {
+                    $("div#userPlaylist").empty().append(data);
+                },
+                error: function () {
+                    alert("something seems wrong");
+                }
+            });
+        }
+    </script>
+    <div class="jumbotron">
+        <h1>JUHANNUS 2014</h1>
+        <div class="h4">Now Playing:</div>
+        <div id="stateicon" style="float: left; padding-bottom: 10px; padding-right: 5px;"></div>
+        <div id="trackname" style="padding-bottom: 10px;">-</div>
+        <div class="progress">
+            <div id="trackprogress" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+            </div>
+        </div>
+    </div>
+<div class="row">
+    <div id="currentPlaylist" class="col-sm-6">
+    </div>
+
+    <div id="userPlaylist" class="col-sm-6">
+    </div>
+</div>
+}
+else
+{
+
+    <div class="jumbotron">
+        <div class="container" style="text-align: center">
+            <h1>JUHANNUS 2014</h1>
+            <h3>Rekisteröidy @Html.ActionLink("tästä!", "Register", "Account")</h3>
+        </div>
+
+    </div>
+    
+    
+}

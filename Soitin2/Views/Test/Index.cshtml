@@ -1,0 +1,145 @@
+﻿
+@{
+    ViewBag.Title = "Browse";
+}
+@Scripts.Render("/Scripts/DataTables-1.10.0/media/js/jquery.dataTables.min.js")
+@Styles.Render("/Content/DataTables-1.10.0/media/css/jquery.dataTables.css")
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("table#taulu").DataTable(
+            {
+                "bServerSide": true,
+                "sAjaxSource": "/Test/TableAjax",
+                "bProcessing": true,
+                "aoColumns":
+                [
+                    { "sName": "Artist" },
+                    { "sName": "Title" },
+                    { "sName": "Album" },
+                    { "sName": "Genre" },
+                    { "sName": "Control", 
+                      "bSortable": false}
+                ]
+            });
+    });
+
+</script>
+
+
+<h2>Browse Tracks!</h2>
+
+
+<table id="taulu">
+    <thead>
+        <tr>
+            <th>Artist</th>
+            <th>Title</th>
+            <th>Album</th>
+            <th>Genre</th>
+            <th>Control</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        console.log("Document Loaded!");
+        $(document).on("click", ".removeButton", function () {
+            var request = $.ajax({
+                type: "GET",
+                url: "/Test/Remove",
+                data: { iTrackId: this.id }
+            });
+            request.done(function (msg) {
+                if (msg["ok"]) {
+                    console.log("Removed " + msg["id"] + " succesfully");
+                    $("button#" + msg["id"]).removeClass("btn-danger removeButton").addClass("btn-primary addButton").empty().append("Add");
+                }
+                else {
+                    console.log("Error!");
+                    console.log(msg);
+                }
+            });
+
+            request.error(function () { alert("Error!"); });
+        });
+        $(document).on("click", ".addButton", function () {
+            var request = $.ajax({
+                type: "GET",
+                url: "/Test/Add",
+                data: { iTrackId: this.id }
+            });
+            request.done(function (msg) {
+                if (msg["ok"]) {
+                    console.log("Added " + msg["id"] + " succesfully");
+                    $("button#" + msg["id"]).removeClass("btn-primary addButton").addClass("btn-danger removeButton").empty().append("Remove");
+                }
+                else {
+                    if (msg["aa"] == 1) {
+                        $("button#" + msg["id"]).removeClass("btn-primary addButton").addClass("btn-default alreadyButton").empty().append("Already added");
+
+                    }
+                    else {
+                        alert("Error!");
+                    }
+                }
+            });
+            request.error(function () { alert("Error!") });
+        });
+
+        $(document).on("click", ".removeCoreButton", function () {
+            var regex = /core(\d+)/g;
+            var id = regex.exec(this.id);
+            var request = $.ajax({
+                type: "GET",
+                url: "/Test/RemoveCore",
+                data: { iTrackId: id[1] }
+            });
+            request.done(function (msg) {
+                if (msg["ok"]) {
+                    console.log("Removed " + msg["id"] + " succesfully");
+                    $("button#core" + msg["id"]).removeClass("btn-danger removeCoreButton").addClass("btn-primary addCoreButton").empty().append("Add to core");
+                }
+                else {
+                    console.log("Error!");
+                    console.log(msg);
+                }
+            });
+
+            request.error(function () { alert("Error!"); });
+
+
+        });
+
+
+        $(document).on("click", ".addCoreButton", function () {
+            var regex = /core(\d+)/g;
+            var id = regex.exec(this.id);
+
+            var request = $.ajax({
+                type: "GET",
+                url: "/Test/AddCore",
+                data: { iTrackId: id[1] }
+            });
+            request.done(function (msg) {
+                if (msg["ok"]) {
+                    console.log("Added " + msg["id"] + " succesfully");
+                    $("button#core" + msg["id"]).removeClass("btn-primary addCoreButton").addClass("btn-danger removeCoreButton").empty().append("Remove from core");
+                }
+                else {
+                    if (msg["aa"] == 1) {
+                        $("button#core" + msg["id"]).removeClass("btn-primary addCoreButton").addClass("btn-default alreadyCoreButton").empty().append("Already in core");
+                    }
+                    else {
+                        alert("Error!");
+                    }
+                }
+            });
+            request.error(function () { alert("Error!") });
+        });
+});
+
+
+</script>
