@@ -17,5 +17,6 @@ namespace Soitin2
         public int Id { get; set; }
         public int playlistquota { get; set; }
         public int numberoftracks { get; set; }
+        public int supplementalplaylistquota { get; set; }
     }
 }

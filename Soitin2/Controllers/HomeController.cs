@@ -12,10 +12,13 @@ namespace Soitin2.Controllers
         public ActionResult Index()
         {
             var Quota = db.SettingsSet.Single().playlistquota;
+            var SupplementalQuota = db.SettingsSet.Single().supplementalplaylistquota;
             var UsedQuota = db.PlaylistSet.Where(a => a.owner.Equals(User.Identity.Name)).Count();
+            var UsedSupplementalQuota = db.SupplementalPlaylistSet.Where(a => a.Owner.Equals(User.Identity.Name)).Count();
             var count = Quota - UsedQuota;
+            var count2 = SupplementalQuota - UsedSupplementalQuota;
 
-            ViewBag.Capacity = "You have " + count + " tracks left to add.";
+            ViewBag.Capacity = "Wishlist: "+count2+"("+SupplementalQuota+") Corelist:"+count+"("+Quota+")";
 
             ViewData["CurrentPlaylist"] = db.CurrentPlaylistSet.ToList();
             ViewData["SupplementalPlaylist"] = db.SupplementalPlaylistView.ToList();

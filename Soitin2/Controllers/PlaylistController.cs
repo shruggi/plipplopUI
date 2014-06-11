@@ -84,6 +84,9 @@ namespace Soitin2.Controllers
 
             var displayedresult = filteredresult.Skip(param.iDisplayStart).Take(param.iDisplayLength);
             List<string[]> resultarray = new List<string[]>();
+
+
+
             string controlcolumn = "";
             if (displayedresult != null)
             {
@@ -151,7 +154,47 @@ namespace Soitin2.Controllers
                 filteredresult = result;
             }
 
-            filteredresult = filteredresult.OrderBy(a => a.addtime);
+
+
+            var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
+            Func<Models.QueueTableModel, string> orderingFunction = (a => sortColumnIndex == 0 ? a.id.ToString() :
+                                                                            sortColumnIndex == 1 ? a.addtime.ToString() :
+                                                                            sortColumnIndex == 2 ? a.artist :
+                                                                            sortColumnIndex == 3 ? a.title :
+                                                                            a.source);
+
+            var sortDirection = Request["sSortDir_0"];
+
+            if (sortDirection == "asc")
+            {
+                switch (sortColumnIndex)
+                {
+                    case 0:
+                        filteredresult = filteredresult.OrderBy(a => a.id);
+                        break;
+                    case 1:
+                        filteredresult = filteredresult.OrderBy(a => a.addtime);
+                        break;
+                    default:
+                        filteredresult = filteredresult.OrderBy(orderingFunction);
+                        break;
+                }
+            }
+            else
+            {
+                switch (sortColumnIndex)
+                {
+                    case 0:
+                        filteredresult = filteredresult.OrderByDescending(a => a.id);
+                        break;
+                    case 1:
+                        filteredresult = filteredresult.OrderByDescending(a => a.addtime);
+                        break;
+                    default:
+                        filteredresult = filteredresult.OrderByDescending(orderingFunction);
+                        break;
+                }
+            }
 
             var displayedresult = filteredresult.Skip(param.iDisplayStart).Take(param.iDisplayLength);
             List<string[]> resultarray = new List<string[]>();
@@ -170,6 +213,137 @@ namespace Soitin2.Controllers
                 iTotalDisplayRecords = filteredresult.Count(),
                 aaData = resultarray
             }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult AddCore(Models.jQueryTrackIdModel param)
+        {
+            bool returnstatus;
+            int aa = 0;
+
+            if (User.Identity.IsAuthenticated && param.iTrackId != 0)
+            {
+                // Does the track exist and doesn't already exist in userlist
+                if (db.TrackSet.Where(a => a.Id.Equals(param.iTrackId)).Count() == 1)
+                {
+                    if (db.PlaylistSet.Where(a => a.TrackId.Equals(param.iTrackId)).Count() > 0)
+                    {
+                        aa = 1;
+                        returnstatus = false;
+                    }
+                    else
+                    {
+                        PlaylistSet newtrack = new PlaylistSet();
+
+                        newtrack.TrackId = param.iTrackId;
+                        newtrack.owner = User.Identity.Name;
+
+                        db.PlaylistSet.Add(newtrack);
+                        db.SaveChanges();
+
+                        returnstatus = true;
+                    }
+                }
+                else
+                {
+                    returnstatus = false;
+                }
+            }
+            else
+            {
+                returnstatus = false;
+            }
+            return Json(new { id = param.iTrackId, ok = returnstatus, alreadyadded = aa }, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult RemoveCore(Models.jQueryTrackIdModel param)
+        {
+            bool returnstatus;
+
+            if (User.Identity.IsAuthenticated && param.iTrackId != 0)
+            {
+                var result = db.PlaylistSet.Where(a => a.TrackId.Equals(param.iTrackId)).Single();
+
+                if (result != null)
+                {
+                    db.PlaylistSet.Remove(result);
+                    db.SaveChanges();
+                    returnstatus = true;
+                }
+                else
+                {
+                    returnstatus = false;
+                }
+            }
+            else
+            {
+                returnstatus = false;
+            }
+            return Json(new { id = param.iTrackId, ok = returnstatus }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Remove(Models.jQueryTrackIdModel param)
+        {
+            bool returnstatus;
+
+            if (User.Identity.IsAuthenticated && param.iTrackId != 0)
+            {
+                var result = db.SupplementalPlaylistSet.Where(a => a.TrackId.Equals(param.iTrackId)).Single();
+
+                if (result != null)
+                {
+                    db.SupplementalPlaylistSet.Remove(result);
+                    db.SaveChanges();
+                    returnstatus = true;
+                }
+                else
+                {
+                    returnstatus = false;
+                }
+            }
+            else
+            {
+                returnstatus = false;
+            }
+            return Json(new { id = param.iTrackId, ok = returnstatus }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Add(Models.jQueryTrackIdModel param)
+        {
+            bool returnstatus;
+            int aa = 0;
+
+            if (User.Identity.IsAuthenticated && param.iTrackId != 0)
+            {
+                // Does the track exist and doesn't already exist in userlist
+                if (db.TrackSet.Where(a => a.Id.Equals(param.iTrackId)).Count() == 1)
+                {
+                    if (db.SupplementalPlaylistSet.Where(a => a.TrackId.Equals(param.iTrackId)).Count() > 0)
+                    {
+                        aa = 1;
+                        returnstatus = false;
+                    }
+                    else
+                    {
+                        SupplementalPlaylistSet newtrack = new SupplementalPlaylistSet();
+
+                        newtrack.TrackId = param.iTrackId;
+                        newtrack.Owner = User.Identity.Name;
+
+                        db.SupplementalPlaylistSet.Add(newtrack);
+                        db.SaveChanges();
+
+                        returnstatus = true;
+                    }
+                }
+                else
+                {
+                    returnstatus = false;
+                }
+            }
+            else
+            {
+                returnstatus = false;
+            }
+            return Json(new { id = param.iTrackId, ok = returnstatus, alreadyadded = aa }, JsonRequestBehavior.AllowGet);
         }
 	}
 }

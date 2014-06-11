@@ -38,6 +38,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="playlistquota" Type="int" Nullable="false" />
           <Property Name="numberoftracks" Type="int" Nullable="false" />
+          <Property Name="supplementalplaylistquota" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="SupplementalPlaylistSet">
           <Key>
@@ -78,6 +79,8 @@ warning 6002: The table/view 'Mopidy.dbo.QueueHistory' does not have a primary k
         <EntityType Name="QueueHistory">
           <Key>
             <PropertyRef Name="Id" />
+            
+            
           </Key>
           <Property Name="Id" Type="int" Nullable="false" />
           <Property Name="addtime" Type="datetime" Nullable="false" />
@@ -219,6 +222,7 @@ warning 6002: The table/view 'Mopidy.dbo.SupplementalPlaylistView' does not have
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="playlistquota" Type="Int32" Nullable="false" />
           <Property Name="numberoftracks" Type="Int32" Nullable="false" />
+          <Property Name="supplementalplaylistquota" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="QueueHistory">
           <Key>
@@ -313,6 +317,7 @@ warning 6002: The table/view 'Mopidy.dbo.SupplementalPlaylistView' does not have
           <EntitySetMapping Name="SettingsSet">
             <EntityTypeMapping TypeName="Model1.SettingsSet">
               <MappingFragment StoreEntitySet="SettingsSet">
+                <ScalarProperty Name="supplementalplaylistquota" ColumnName="supplementalplaylistquota" />
                 <ScalarProperty Name="numberoftracks" ColumnName="numberoftracks" />
                 <ScalarProperty Name="playlistquota" ColumnName="playlistquota" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
